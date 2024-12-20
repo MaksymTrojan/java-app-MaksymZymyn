@@ -5,6 +5,8 @@ on:
     branches:
       - main   # Trigger the workflow on push to the main branch
   pull_request:
+    branches:
+      - develop
     types:
       - opened
       - synchronize   # Trigger when the PR is opened or synchronized (updated)
