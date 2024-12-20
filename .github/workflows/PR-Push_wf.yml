@@ -38,15 +38,20 @@ jobs:
         # Build the project (compile and package into a JAR)
         ./mvnw clean package
         # Run the Spring Boot application in the background
-        java -jar ./target/*.jar --server.port=8080 &  # Run in background
+        nohup java -jar ./target/*.jar --server.port=8080 > server.log 2>&1 &  # Use nohup to run in background
         echo "Server started in the background"
 
-    # Step 6: Run unit tests (if any exist in the project)
+    # Step 6: Wait for the server to start (optional, can help avoid race conditions)
+    - name: Wait for the server to start
+      run: |
+        sleep 10  # Wait for 10 seconds to allow the server to start
+
+    # Step 7: Run unit tests
     - name: Run unit tests
       run: |
         ./mvnw test
 
-    # Step 7: Check if the server is up and running (using curl to check health endpoint)
+    # Step 8: Check if the server is up and running (using curl to check health endpoint)
     - name: Check server health
       run: |
         curl -s 'http://localhost:8080/actuator/health' || echo "Server not reachable"
