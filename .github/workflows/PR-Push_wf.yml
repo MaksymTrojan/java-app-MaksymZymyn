@@ -1,9 +1,13 @@
-name: Push Workflow
+name: PR-Push Workflow
 
 on:
   push:
     branches:
       - main   # Trigger the workflow on push to the main branch
+  pull_request:
+    types:
+      - opened
+      - synchronize   # Trigger when the PR is opened or synchronized (updated)
   workflow_dispatch:  # Allow manual triggering of the workflow
 
 jobs:
@@ -27,7 +31,7 @@ jobs:
       run: |
         chmod +x ./mvnw
 
-    # Step 4: Download and install project dependencies
+    # Step 4: Download and install project dependencies (skip tests)
     - name: Install dependencies (skip tests)
       run: |
         ./mvnw clean install -DskipTests  # Install dependencies without running tests
@@ -37,8 +41,8 @@ jobs:
       run: |
         # Build the project (compile and package into a JAR)
         ./mvnw clean package
-        # Run the Spring Boot application in the background
-        nohup java -jar ./target/*.jar --server.port=8080 > server.log 2>&1 &  # Use nohup to run in background
+        # Run the Spring Boot application in the background using nohup
+        nohup java -jar ./target/*.jar --server.port=8080 > server.log 2>&1 &  # Run in background
         echo "Server started in the background"
 
     # Step 6: Wait for the server to start (optional, can help avoid race conditions)
@@ -46,10 +50,10 @@ jobs:
       run: |
         sleep 10  # Wait for 10 seconds to allow the server to start
 
-    # Step 7: Skip unit tests (they are already skipped in the install step)
-    - name: Skip unit tests
+    # Step 7: Skip running unit tests (create a dummy step)
+    - name: Skip unit tests (dummy step)
       run: |
-        echo "Tests are skipped for now."
+        echo "Tests have been skipped for this workflow run."
 
     # Step 8: Check if the server is up and running (using curl to check health endpoint)
     - name: Check server health
