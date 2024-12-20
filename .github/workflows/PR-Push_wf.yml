@@ -20,7 +20,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: '17'
-        distribution: 'adoptopenjdk'
+        distribution: 'zulu'
 
     # Step 3: Install Maven and ensure it has the necessary permissions
     - name: Set up Maven
